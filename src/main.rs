@@ -2,8 +2,8 @@ extern crate image;
 use image::{ImageBuffer, Rgba};
 use rand::Rng;
 
-const GRID_WIDTH: usize = 300; 
-const GRID_HEIGHT: usize = 70; 
+const GRID_WIDTH: usize = 250; 
+const GRID_HEIGHT: usize = 80; 
 
 fn create_empty_grid() -> Vec<Vec<bool>> {
     vec![vec![false; GRID_WIDTH]; GRID_HEIGHT] 
@@ -43,7 +43,7 @@ fn randomize_grid(grid: &mut Vec<Vec<bool>>) {
     for row in grid.iter_mut() {
         for cell in row.iter_mut() {
             let random_number: f64 = rng.gen();
-            let cell_value = random_number > 0.4; 
+            let cell_value = random_number > 0.3; 
             *cell = cell_value;
         }
     }
@@ -109,16 +109,56 @@ fn display_grid(grid: &Vec<Vec<bool>>) {
         for col in 0..GRID_WIDTH {
             let cell = grid[row][col];
 
-            print!("{}", if cell { '#' } else { ' ' });
+            print!("{}", if cell { '@' } else { ' ' });
         }
         println!("");
+    }
+}
+
+fn initialize_glider_gun(grid: &mut Vec<Vec<bool>>) {
+    let glider_gun = [
+        (5, 1), (6, 1), (5, 2), (6, 2), 
+        (5, 11), (6, 11), (7, 11),
+        (4, 12), (8, 12),
+        (3, 13), (9, 13),
+        (3, 14), (9, 14),
+        (6, 15),
+        (4, 16), (8, 16),
+        (5, 17), (6, 17), (7, 17),
+        (6, 18),
+        (3, 21), (4, 21), (5, 21),
+        (3, 22), (4, 22), (5, 22),
+        (2, 23), (6, 23),
+        (1, 25), (2, 25), (6, 25), (7, 25),
+        (3, 35), (4, 35),
+        (3, 36), (4, 36),
+    ];
+
+    for &(row, col) in &glider_gun {
+        grid[row][col] = true;
+    }
+}
+
+fn add_not_gate(grid: &mut Vec<Vec<bool>>) {
+    let not_gate = [
+        (11, 3), (11, 4), (11, 5), (11, 6), (11, 7),
+        (12, 3), (12, 7),
+        (13, 3), (13, 7),
+        (14, 3), (14, 4), (14, 5), (14, 6), (14, 7),
+    ];
+
+    for &(row, col) in &not_gate {
+        grid[row][col] = true;
     }
 }
 
 fn main() {
     let mut grid = create_empty_grid();
 
-    randomize_grid(&mut grid);
+    //randomize_grid(&mut grid);
+
+    initialize_glider_gun(&mut grid);
+    //add_not_gate(&mut grid);
 
     let mut reset_counter = 0;
     loop {
@@ -128,15 +168,15 @@ fn main() {
         display_grid(&grid);
         update_grid(&mut grid);
 
-        //if reset_counter > 500{
-        //    randomize_grid(&mut grid);
-        //    reset_counter = 0;
-        //}
+        // if reset_counter > 1000{
+        //     randomize_grid(&mut grid);
+        //     reset_counter = 0;
+        // }
 
-        reset_counter += 1;
+        // reset_counter += 1;
 
         //save_image("output.png", &grid);
 
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        std::thread::sleep(std::time::Duration::from_millis(10));
     }
 }
